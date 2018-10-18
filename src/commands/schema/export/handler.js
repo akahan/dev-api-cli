@@ -5,7 +5,7 @@ module.exports = async (argv, ctx) => {
 
   const result = {
     tables: schema.tables.items,
-    version: ctx.pkg.version
+    version: ctx.pkg.version,
   };
 
   fs.writeFileSync(argv.file, JSON.stringify(result, null, 2));

@@ -46,7 +46,7 @@ module.exports = async (argv, ctx) => {
       if (schemaField.isSystem) {
         continue;
       }
-      
+
       const field = pick(schemaField, [
         'name',
         'displayName',
