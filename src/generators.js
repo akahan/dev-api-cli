@@ -28,12 +28,14 @@ const loginRequest = () => `mutation Login($data: UserLoginInput!) {
 
 const getTablesRequest = onlyUsers => `query GetTables {
   tablesList(filter: { onlyUserTables: ${onlyUsers ? 'true' : 'false'} }) {
-    id
-    name
-    isSystem
-    fields {
+    items {
+      id
       name
-      fieldType
+      isSystem
+      fields {
+        name
+        fieldType
+      }
     }
   }
 }`;
@@ -62,25 +64,44 @@ const createEntityRequest = tableName => `mutation ${tableName}Create($data: ${t
   }
 }`;
 
-const exportSchemaRequest = () => `query ExportSchema {
-  tables: tablesList(filter: { onlyUserTables: true }) {
-    ...TableFragment
+const exportSchemaRequest = () => `
+  query ExportSchema {
+    tables: tablesList(filter: { onlyUserTables: true }) {
+      items {
+        ...TableFragment
+      }
+    }
   }
-}
 
-fragment TableFragment on Table {
-  id
-  name
-  displayName
-  isSystem
-  fields {
+  fragment TableFragment on Table {
+    id
+    name
+    displayName
+    isSystem
+    fields {
+      ...TableFieldFragment
+    }
+  }
+
+  fragment TableFieldFragment on TableField {
+    ...CommonTableFieldFragment
+    fieldTypeAttributes {
+      ...TextFieldTypeAttributes
+      ...NumberFieldTypeAttributes
+      ...FileFieldTypeAttributes
+      ...DateFieldTypeAttributes
+      ...SwitchFieldTypeAttributes
+      ...CustomFieldTypesAttributes
+    }
+  }
+
+  fragment CommonTableFieldFragment on TableField {
     id
     name
     displayName
     description
     fieldType
     fieldTypeAttributes {
-      id
       ...TextFieldTypeAttributes
       ...NumberFieldTypeAttributes
       ...FileFieldTypeAttributes
@@ -91,48 +112,72 @@ fragment TableFragment on Table {
     isRequired
     isUnique
     defaultValue
+    isSystem
+    isMeta
     relation {
-      id
-      refFieldIsList
-      refFieldIsRequired
       refFieldName
       refFieldDisplayName
+      relationTableName
+      relationFieldName
       refTable {
+        id
         name
+      }
+      refFieldIsList
+      refFieldIsRequired
+    }
+  }
+
+  fragment DateFieldTypeAttributes on DateFieldTypeAttributes {
+    format
+  }
+
+  fragment TextFieldTypeAttributes on TextFieldTypeAttributes {
+    format
+    fieldSize
+  }
+
+  fragment NumberFieldTypeAttributes on NumberFieldTypeAttributes {
+    format
+    precision
+    currency
+    minValue
+    maxValue
+  }
+
+  fragment FileFieldTypeAttributes on FileFieldTypeAttributes {
+    format
+    showTitle
+    showUrl
+    maxSize
+    typeRestrictions
+  }
+
+  fragment CustomFieldTypesAttributes on CustomFieldTypeAttributes {
+    format
+    innerFields {
+      name
+      displayName
+      description
+      fieldType
+      isList
+      isRequired
+      isUnique
+      fieldTypeAttributes {
+        ...TextFieldTypeAttributes
+        ...NumberFieldTypeAttributes
+        ...FileFieldTypeAttributes
+        ...DateFieldTypeAttributes
+        ...SwitchFieldTypeAttributes
       }
     }
   }
-}
 
-fragment DateFieldTypeAttributes on DateFieldTypeAttributes {
-  format
-}
-
-fragment TextFieldTypeAttributes on TextFieldTypeAttributes {
-  format
-  fieldSize
-}
-
-fragment NumberFieldTypeAttributes on NumberFieldTypeAttributes {
-  format
-  precision
-  currency
-  minValue
-  maxValue
-}
-
-fragment FileFieldTypeAttributes on FileFieldTypeAttributes {
-  format
-  showTitle
-  showUrl
-  maxSize
-  typeRestrictions
-}
-
-fragment SwitchFieldTypeAttributes on SwitchFieldTypeAttributes {
-  format
-  listOptions
-}`;
+  fragment SwitchFieldTypeAttributes on SwitchFieldTypeAttributes {
+    format
+    listOptions
+  }
+`;
 
 module.exports = {
   signUpRequest,

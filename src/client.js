@@ -91,7 +91,7 @@ class Client {
 
     const response = await this.execute(request);
 
-    return response.tablesList;
+    return response.tablesList.items;
   }
 
   async createTable(data) {

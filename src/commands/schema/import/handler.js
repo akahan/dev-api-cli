@@ -43,6 +43,10 @@ module.exports = async (argv, ctx) => {
     const table = importedTables.get(schemaTable.name);
 
     for (const schemaField of schemaTable.fields) {
+      if (schemaField.isSystem) {
+        continue;
+      }
+      
       const field = pick(schemaField, [
         'name',
         'displayName',
