@@ -1,4 +1,4 @@
-# 8base-api-cli
+# 8base-api-cli (DEPRECATED)
 The 8base API Command Line Interface (CLI)
 
 ## Table of Contents
